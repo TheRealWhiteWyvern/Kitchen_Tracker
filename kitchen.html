@@ -9,7 +9,8 @@
     <h1>Kitchen Tracker</h1>
     <div id="kitchen-appliances">
         <h2>Appliances</h2>
-        <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); return false;">
+        <button id="toggle-add-form" onclick="toggleAddApplianceForm()">Show Add Appliance Form</button>
+        <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); ListAppliances(); return false;">
             <label for="appliance-name">Appliance Name:</label>
             <input type="text" id="appliance-name" name="appliance-name" required>
             <label for="appliance-location">Appliance Location:</label>
@@ -20,6 +21,10 @@
         </form>
         <div id="appliance-list">
             <button onclick="ListAppliances()">Refresh Appliance List</button>
+        </div>
+        <div>
+            <!-- Display Appliances -->
+            <button onclick="showAppliances()">Show Appliances</button>
         </div>
     </div>
 </body>
