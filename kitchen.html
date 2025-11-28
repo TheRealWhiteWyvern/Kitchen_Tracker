@@ -10,17 +10,18 @@
     <div id="kitchen-appliances">
         <h2>Appliances</h2>
         <button id="toggle-add-form" onclick="toggleAddApplianceForm()">Show Add Appliance Form</button>
-        <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); ListAppliances(); return false;">
-            <label for="appliance-name">Appliance Name:</label>
-            <input type="text" id="appliance-name" name="appliance-name" required>
-            <label for="appliance-location">Appliance Location:</label>
-            <input type="text" id="appliance-location" name="appliance-location" required>
-            <label for="num-drawers">Number of Drawers:</label>
-            <input type="number" id="num-drawers" name="num-drawers" min="1" required>
-            <button type="submit">Add Appliance</button>
-        </form>
+        <div id="appliance-form-container">
+            <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); ListAppliances(); return false;">
+                <label for="appliance-name">Appliance Name:</label>
+                <input type="text" id="appliance-name" name="appliance-name" required>
+                <label for="appliance-location">Appliance Location:</label>
+                <input type="text" id="appliance-location" name="appliance-location" required>
+                <label for="num-drawers">Number of Drawers:</label>
+                <input type="number" id="num-drawers" name="num-drawers" min="1" required>
+                <button type="submit">Add Appliance</button>
+            </form>
+        </div>
         <div id="appliance-list">
-            <button onclick="ListAppliances()">Refresh Appliance List</button>
         </div>
         <div>
             <!-- Display Appliances -->

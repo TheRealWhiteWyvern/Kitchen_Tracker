@@ -29,12 +29,9 @@ class Item{
 }
 
 function AddAppliance(name, location, numOfDraws){
-    const fridge = new Appliance(name, location, numOfDraws);
-}
-
-function ListAppliances(){
-    // code to list appliances
-    console.log(ApplianceList);
+    const count = parseInt(numOfDraws, 10) || 0;
+    const appliance = new Appliance(name, location, count);
+    return appliance;
 }
 
 function showAppliances(){
@@ -44,8 +41,12 @@ function showAppliances(){
     for (let i = 0; i < ApplianceList.length; i++){
         const item = ApplianceList[i];
         const applianceDiv = document.createElement('div');
+        applianceDiv.setAttribute("class", `appliance`);
         applianceDiv.innerHTML = `<h3>${item.name} - ${item.location}</h3>
                                   <p>Number of Drawers: ${item.numOfDraws}</p>`;
+        for (let j = 0; j < item.numOfDraws; j++){
+            applianceDiv.innerHTML += `<p>Drawer ${j+1}: ${item[`drawer${j+1}`].items.length} items</p>`;
+        }
         container.appendChild(applianceDiv);
     }
 }
@@ -62,4 +63,9 @@ function toggleAddApplianceForm(){
         form.style.display = 'none';
         btn.textContent = 'Show Add Appliance Form';
     }
+}
+
+// Back-compat: HTML calls ListAppliances(); forward to showAppliances
+function ListAppliances(){
+    showAppliances();
 }
