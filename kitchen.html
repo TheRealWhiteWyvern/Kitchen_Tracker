@@ -11,7 +11,7 @@
         <h2>Appliances</h2>
         <button id="toggle-add-form" onclick="toggleAddApplianceForm()">Show Add Appliance Form</button>
         <div id="appliance-form-container">
-            <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); ListAppliances(); return false;">
+            <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); showAppliances(); return false;">
                 <label for="appliance-name">Appliance Name:</label>
                 <input type="text" id="appliance-name" name="appliance-name" required>
                 <label for="appliance-location">Appliance Location:</label>
@@ -22,10 +22,6 @@
             </form>
         </div>
         <div id="appliance-list">
-        </div>
-        <div>
-            <!-- Display Appliances -->
-            <button onclick="showAppliances()">Show Appliances</button>
         </div>
     </div>
 </body>

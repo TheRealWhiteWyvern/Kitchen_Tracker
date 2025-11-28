@@ -40,14 +40,24 @@ function showAppliances(){
     container.innerHTML = '';
     for (let i = 0; i < ApplianceList.length; i++){
         const item = ApplianceList[i];
-        const applianceDiv = document.createElement('div');
-        applianceDiv.setAttribute("class", `appliance`);
-        applianceDiv.innerHTML = `<h3>${item.name} - ${item.location}</h3>
-                                  <p>Number of Drawers: ${item.numOfDraws}</p>`;
-        for (let j = 0; j < item.numOfDraws; j++){
-            applianceDiv.innerHTML += `<p>Drawer ${j+1}: ${item[`drawer${j+1}`].items.length} items</p>`;
-        }
-        container.appendChild(applianceDiv);
+        const appliance = document.createElement('div');
+        appliance.setAttribute("class", `appliance`);
+        const applianceDoor = document.createElement('div');
+        applianceDoor.setAttribute("class", `appliance-door`);
+        const applianceHandle = document.createElement('div');
+        applianceHandle.setAttribute("class", `appliance-handle`);
+        applianceDoor.appendChild(applianceHandle);
+        appliance.appendChild(applianceDoor);
+        const title = document.createElement('h3');
+        title.textContent = `${item.name} - ${item.location}`;
+        appliance.appendChild(title);
+
+        // appliance.innerHTML = `<h3>${item.name} - ${item.location}</h3>
+        //                           <p>Number of Drawers: ${item.numOfDraws}</p>`;
+        // for (let j = 0; j < item.numOfDraws; j++){
+        //     appliance.innerHTML += `<p>Drawer ${j+1}: ${item[`drawer${j+1}`].items.length} items</p>`;
+        // }
+        container.appendChild(appliance);
     }
 }
 
@@ -65,7 +75,6 @@ function toggleAddApplianceForm(){
     }
 }
 
-// Back-compat: HTML calls ListAppliances(); forward to showAppliances
-function ListAppliances(){
-    showAppliances();
-}
+const freezer = new Appliance('Freezer', 'Kitchen', 3);
+const freezerGarage = new Appliance('Freezer', 'Garage', 5);
+showAppliances();
