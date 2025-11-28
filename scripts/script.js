@@ -12,6 +12,68 @@ class Appliance{
         ApplianceList.push(this);
     }
 
+    drawClosed(container) {
+        this.isOpen = false;
+        container.classList.remove("open");
+
+
+        container.innerHTML = "";
+        container.className = "appliance";
+
+        const applianceDoor = document.createElement("div");
+        applianceDoor.className = "appliance-door";
+
+        const applianceHandle = document.createElement("div");
+        applianceHandle.className = "appliance-handle";
+        applianceDoor.appendChild(applianceHandle);
+
+        const title = document.createElement("h3");
+        title.textContent = `${this.location} ${this.name}`;
+        applianceDoor.appendChild(title);
+
+        // Click to open
+        applianceDoor.addEventListener("click", () => {
+            applianceDoor.classList.add("open");
+
+            // delay inside redraw so animation is seen
+            setTimeout(() => this.drawOpen(container), 450);
+        });
+
+        container.appendChild(applianceDoor);
+    }
+
+    drawOpen(container) {
+        this.isOpen = true;
+        container.classList.add("open");
+
+        container.innerHTML = "";
+        container.className = "appliance";
+
+        // Door remains to allow closing animation
+        const applianceDoor = document.createElement("div");
+        applianceDoor.className = "appliance-door open"; // already open
+
+        const applianceHandle = document.createElement("div");
+        applianceHandle.className = "appliance-handle";
+        applianceDoor.appendChild(applianceHandle);
+
+        // Click to close
+        applianceDoor.addEventListener("click", () => {
+            applianceDoor.classList.remove("open");
+
+            setTimeout(() => this.drawClosed(container), 450);
+        });
+
+        container.appendChild(applianceDoor);
+
+        // Drawers & interior
+
+        for (let j = 0; j < this.numOfDraws; j++) {
+            const drawer = document.createElement("p");
+            drawer.textContent = `Drawer ${j + 1}: ${this[`drawer${j+1}`].items.length} items`;
+            container.appendChild(drawer);
+        }
+    }
 }
 
 class Drawer{
@@ -40,24 +102,9 @@ function showAppliances(){
     container.innerHTML = '';
     for (let i = 0; i < ApplianceList.length; i++){
         const item = ApplianceList[i];
-        const appliance = document.createElement('div');
-        appliance.setAttribute("class", `appliance`);
-        const applianceDoor = document.createElement('div');
-        applianceDoor.setAttribute("class", `appliance-door`);
-        const applianceHandle = document.createElement('div');
-        applianceHandle.setAttribute("class", `appliance-handle`);
-        applianceDoor.appendChild(applianceHandle);
-        appliance.appendChild(applianceDoor);
-        const title = document.createElement('h3');
-        title.textContent = `${item.name} - ${item.location}`;
-        appliance.appendChild(title);
-
-        // appliance.innerHTML = `<h3>${item.name} - ${item.location}</h3>
-        //                           <p>Number of Drawers: ${item.numOfDraws}</p>`;
-        // for (let j = 0; j < item.numOfDraws; j++){
-        //     appliance.innerHTML += `<p>Drawer ${j+1}: ${item[`drawer${j+1}`].items.length} items</p>`;
-        // }
-        container.appendChild(appliance);
+        const applianceDiv = document.createElement('div');
+        item.drawClosed(applianceDiv);
+        container.appendChild(applianceDiv);
     }
 }
 
