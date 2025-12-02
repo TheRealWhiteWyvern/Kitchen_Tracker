@@ -5,9 +5,6 @@ class Appliance{
         this.name = name;
         this.location = location;
         this.numOfDraws = numOfDraws;
-        for (let i = 0; i < numOfDraws; i++){
-            this[`drawer${i+1}`] = new Drawer(false);
-        }
         console.log(this);
         ApplianceList.push(this);
     }
@@ -46,7 +43,7 @@ class Appliance{
         this.isOpen = true;
         container.classList.add("open");
 
-        container.innerHTML = "";
+        container.innerHTML = ""; 
         container.className = "appliance";
 
         // Door remains to allow closing animation
@@ -70,7 +67,10 @@ class Appliance{
 
         for (let j = 0; j < this.numOfDraws; j++) {
             const drawer = new Drawer(j + 1, container);
-            drawer.drawClosed();
+            const drawerElement = document.createElement("div");
+            drawer.drawClosed(drawerElement);
+            // Append each drawer once in order so updates don't reorder
+            container.appendChild(drawerElement);
         }
     }
 }
@@ -81,14 +81,73 @@ class Drawer{
         this.container = container;
         this.isOpen = false;
         this.items = [];
+        this.animating = false;
     }
-    drawClosed(){
+    drawClosed(draw){
         this.isOpen = false;
-        const drawerElement = document.createElement("div");
-        drawerElement.className = "drawer-closed";
-        drawerElement.textContent = `Drawer ${this.num}: ${this.items.length} items`;
-        this.container.appendChild(drawerElement);
+        // Reset any previous handler to avoid stacking
+        draw.onclick = null;
+
+        draw.classList.remove("open");
+        draw.innerHTML = "";
+        draw.className = "drawer";
+        draw.textContent = `Drawer ${this.num}: ${this.items.length} items`;
+
+        // Click to Open (debounced during animation)
+        draw.onclick = () => {
+            if (this.animating) return;
+            this.animating = true;
+
+            // Optional visual state before redraw
+            draw.classList.add("open");
+
+            setTimeout(() => {
+                this.drawOpen(draw);
+                this.animating = false;
+            }, 450);
+        };
+
+        // Do not append here; appending moves the node to the end and reorders drawers
     }
+
+    drawOpen(draw){
+        this.isOpen = true;
+        const item1 = new Item("Chips", "Frozen1");
+        const item2 = new Item("Veggies", "Frozen2");
+        this.items.push(item1, item2);
+        this.listItems();
+        // Reset any previous handler to avoid stacking
+        draw.onclick = null;
+
+        draw.classList.add("open");
+
+        draw.innerHTML = "";
+        draw.className = "drawer open";
+        draw.textContent = `Drawer ${this.num}: ${this.items.length} items`;
+
+        // Click to Close (debounced during animation)
+        draw.onclick = () => {
+            if (this.animating) return;
+            this.animating = true;
+
+            draw.classList.remove("open");
+
+            setTimeout(() => {
+                this.drawClosed(draw);
+                this.animating = false;
+            }, 450);
+
+        };
+
+    }
+
+    listItems(){
+        console.log(`Items in Drawer ${this.num}:`);
+        for (let i = 0; i < this.items.length; i++){
+            console.log(`- ${this.items[i].name} (${this.items[i].type})`);
+        };
+    }
+
 }
 
 class Item{
