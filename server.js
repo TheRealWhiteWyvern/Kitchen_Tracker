@@ -88,8 +88,9 @@ async function ensureDataDirectory() {
     try {
         await fs.access(USERS_FILE);
     } catch {
-        // Create default user: username "admin", password "admin" (change this!)
-        const hashedPassword = await bcrypt.hash('admin', 10);
+        // Create default user: username "admin", password from env ADMIN_PASSWORD (fallback: "admin")
+        const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'admin';
+        const hashedPassword = await bcrypt.hash(defaultAdminPassword, 10);
         const defaultUser = {
             username: 'admin',
             password: hashedPassword
@@ -179,7 +180,5 @@ app.get('/', (req, res) => {
 ensureDataDirectory().then(() => {
     app.listen(PORT, () => {
         console.log(`Kitchen Tracker server running on http://localhost:${PORT}`);
-        console.log('Default credentials: username=admin, password=admin');
-        console.log('IMPORTANT: Change the default password after first login!');
     });
 });
