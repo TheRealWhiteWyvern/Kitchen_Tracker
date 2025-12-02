@@ -69,17 +69,25 @@ class Appliance{
         // Drawers & interior
 
         for (let j = 0; j < this.numOfDraws; j++) {
-            const drawer = document.createElement("p");
-            drawer.textContent = `Drawer ${j + 1}: ${this[`drawer${j+1}`].items.length} items`;
-            container.appendChild(drawer);
+            const drawer = new Drawer(j + 1, container);
+            drawer.drawClosed();
         }
     }
 }
 
 class Drawer{
-    constructor(isOpen){
-        this.isOpen = isOpen;
+    constructor(num, container){
+        this.num = num;
+        this.container = container;
+        this.isOpen = false;
         this.items = [];
+    }
+    drawClosed(){
+        this.isOpen = false;
+        const drawerElement = document.createElement("div");
+        drawerElement.className = "drawer-closed";
+        drawerElement.textContent = `Drawer ${this.num}: ${this.items.length} items`;
+        this.container.appendChild(drawerElement);
     }
 }
 
