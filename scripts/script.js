@@ -247,6 +247,7 @@ class Drawer{
             if (newItemName && newItemType) {
                 const newItem = new Item(newItemName, newItemType);
                 this.items.push(newItem);
+                autoSave(); // Save to server
                 this.toggleItems(draw, true); // Refresh popup
             }
         };
@@ -271,6 +272,7 @@ class Item{
 function AddAppliance(name, location, numOfDraws){
     const count = parseInt(numOfDraws, 10) || 0;
     const appliance = new Appliance(name, location, count);
+    autoSave(); // Save to server
     return appliance;
 }
 
@@ -300,6 +302,67 @@ function toggleAddApplianceForm(){
     }
 }
 
-const freezer = new Appliance('Freezer', 'Kitchen', 3);
-const freezerGarage = new Appliance('Freezer', 'Garage', 5);
-showAppliances();
+// Load appliances from server on page load
+async function loadAppliances() {
+    try {
+        const response = await fetch('/api/appliances');
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = '/login.html';
+                return;
+            }
+            throw new Error('Failed to load appliances');
+        }
+        
+        const appliancesData = await response.json();
+        
+        // Reconstruct appliances from saved data
+        ApplianceList = [];
+        appliancesData.forEach(data => {
+            const appliance = new Appliance(data.name, data.location, data.numOfDraws);
+            // Restore drawer items
+            for (let i = 0; i < data.numOfDraws; i++) {
+                const drawerKey = `drawer${i+1}`;
+                if (data[drawerKey] && data[drawerKey].items) {
+                    appliance[drawerKey].items = data[drawerKey].items.map(item => 
+                        new Item(item.name, item.type)
+                    );
+                }
+            }
+        });
+        
+        showAppliances();
+    } catch (error) {
+        console.error('Error loading appliances:', error);
+    }
+}
+
+// Save appliances to server
+async function saveAppliances() {
+    try {
+        const response = await fetch('/api/appliances', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ApplianceList)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to save appliances');
+        }
+        
+        console.log('Appliances saved successfully');
+    } catch (error) {
+        console.error('Error saving appliances:', error);
+        alert('Failed to save data. Please try again.');
+    }
+}
+
+// Auto-save when data changes
+function autoSave() {
+    saveAppliances();
+}
+
+// Load appliances when page loads
+loadAppliances();

@@ -1,0 +1,9 @@
+node_modules/
+.env
+data/appliances.json
+data/users.json
+*.log
+QUICKSTART.md
+README_changed.md
+SETUP.md
+DEPLOYMENT.md

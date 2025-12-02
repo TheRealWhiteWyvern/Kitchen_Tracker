@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <head>
     <title>Kitchen</title>
-    <link rel="stylesheet" type="text/css" href="../styles/style.css">
-    <script src="../scripts/script.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
+    <script src="scripts/script.js" defer></script>
 </head>
 
 <body>
-    <h1>Kitchen Tracker</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+        <h1>Kitchen Tracker</h1>
+        <button id="logout-btn" onclick="logout()" style="padding: 10px 20px; background: #ff5555; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Logout</button>
+    </div>
+    <script>
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+    </script>
     <div id="kitchen-appliances">
         <h2>Appliances</h2>
         <button id="toggle-add-form" onclick="toggleAddApplianceForm()">Show Add Appliance Form</button>

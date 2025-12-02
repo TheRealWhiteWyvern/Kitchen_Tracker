@@ -1,0 +1,22 @@
+{
+  "$schema": "https://render.com/schema/v1",
+  "services": [
+    {
+      "type": "web",
+      "name": "kitchen-tracker",
+      "env": "node",
+      "buildCommand": "npm install",
+      "startCommand": "npm start",
+      "envVars": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "SESSION_SECRET",
+          "generateValue": true
+        }
+      ]
+    }
+  ]
+}
