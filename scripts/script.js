@@ -28,6 +28,19 @@ class Appliance{
         title.textContent = `${this.location} ${this.name}`;
         applianceDoor.appendChild(title);
 
+        // Persistent delete button overlay (red X)
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "✕";
+        delBtn.className = "delete-item-button";
+        delBtn.title = "Delete appliance";
+        delBtn.onclick = () => {
+            if (typeof this._index === 'number') {
+                delAppliance(this._index);
+            }
+        };
+        // Ensure container positioned for absolute button
+        container.style.position = 'relative';
+
         // Click to open
         applianceDoor.addEventListener("click", () => {
             applianceDoor.classList.add("open");
@@ -37,6 +50,7 @@ class Appliance{
         });
 
         container.appendChild(applianceDoor);
+        container.appendChild(delBtn);
     }
 
     drawOpen(container) {
@@ -62,6 +76,19 @@ class Appliance{
         });
 
         container.appendChild(applianceDoor);
+
+        // Persistent delete button overlay (red X)
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "✕";
+        delBtn.className = "delete-item-button";
+        delBtn.title = "Delete appliance";
+        delBtn.onclick = () => {
+            if (typeof this._index === 'number') {
+                delAppliance(this._index);
+            }
+        };
+        container.style.position = 'relative';
+        container.appendChild(delBtn);
 
         // Drawers & interior
 
@@ -158,10 +185,21 @@ class Drawer{
         const itemList = document.createElement("div");
         itemList.className = "item-list";
         if (this.items.length > 0) {
-            this.items.forEach(item => {
+            this.items.forEach((item, index) => {
                 const itemCard = document.createElement("div");
                 itemCard.className = "item-card";
                 itemCard.innerHTML = `<h4>${item.name}</h4><p>${item.type}</p>`;
+                
+                const delButton = document.createElement("button");
+                delButton.textContent = "✕";
+                delButton.className = "delete-item-button";
+                delButton.title = "Delete item";
+                delButton.onclick = () => {
+                    this.items.splice(index, 1);
+                    autoSave();
+                    this.toggleItems(draw, true); // Refresh popup
+                };
+                itemCard.appendChild(delButton);
                 itemList.appendChild(itemCard);
             });
         } else {
@@ -276,6 +314,19 @@ function AddAppliance(name, location, numOfDraws){
     return appliance;
 }
 
+function delAppliance(name, location, numOfDraws){
+    for (let i = 0; i < ApplianceList.length; i++){
+        if (ApplianceList[i].name === name && ApplianceList[i].location === location && ApplianceList[i].numOfDraws === numOfDraws) {
+            ApplianceList.splice(i, 1);
+            autoSave(); // Save to server
+            break;
+        }
+        else {
+            console.log("No matching appliance found.");
+        }
+    }
+}
+
 function showAppliances(){
     const container = document.getElementById('appliance-list');
     if (!container) return;
@@ -283,6 +334,8 @@ function showAppliances(){
     for (let i = 0; i < ApplianceList.length; i++){
         const item = ApplianceList[i];
         const applianceDiv = document.createElement('div');
+        // Pass index to appliance for internal delete button handling
+        item._index = i;
         item.drawClosed(applianceDiv);
         container.appendChild(applianceDiv);
     }
@@ -299,6 +352,27 @@ function toggleAddApplianceForm(){
     } else {
         form.style.display = 'none';
         btn.textContent = 'Show Add Appliance Form';
+    }
+}
+
+// Delete an appliance by index
+function delAppliance(index){
+    if (index >= 0 && index < ApplianceList.length){
+        const appliance = ApplianceList[index];
+        const label = `${appliance.name}`.trim();
+        const confirmName = prompt(`Type the appliance name to delete:\n${label}`);
+        if (!confirmName) {
+            return; // cancelled
+        }
+        const normalizedInput = confirmName.trim().toLowerCase();
+        const normalizedName = appliance.name.trim().toLowerCase();
+        if (normalizedInput !== normalizedName) {
+            alert('Name mismatch. Deletion cancelled.');
+            return;
+        }
+        ApplianceList.splice(index, 1);
+        autoSave();
+        showAppliances();
     }
 }
 

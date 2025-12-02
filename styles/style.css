@@ -388,3 +388,37 @@ body {
 .add-item-form button[type="button"] {
     background: #888;
 }
+
+/* Delete item button (red X) */
+.delete-item-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff5555;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background 0.2s ease, transform 0.2s ease;
+    line-height: 1;
+    padding: 0;
+    z-index: 5; /* Above appliance door overlay */
+    pointer-events: auto; /* Ensure clickable even over overlay */
+}
+
+.delete-item-button:hover {
+    background: #ff3333;
+    transform: scale(1.15);
+}
+
+.popup .item-card {
+    position: relative;
+}
