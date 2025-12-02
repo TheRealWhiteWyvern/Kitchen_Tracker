@@ -305,7 +305,7 @@ function toggleAddApplianceForm(){
 // Load appliances from server on page load
 async function loadAppliances() {
     try {
-        const response = await fetch('/api/appliances');
+        const response = await fetch('/api/appliances', { credentials: 'same-origin' });
         if (!response.ok) {
             if (response.status === 401) {
                 window.location.href = '/login.html';
@@ -345,6 +345,7 @@ async function saveAppliances() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify(ApplianceList)
         });
         

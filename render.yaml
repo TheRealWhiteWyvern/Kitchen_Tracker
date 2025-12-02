@@ -14,7 +14,7 @@
         },
         {
           "key": "SESSION_SECRET",
-          "generateValue": true
+          "generateValue": false
         }
       ]
     }

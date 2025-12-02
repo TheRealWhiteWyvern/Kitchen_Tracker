@@ -8,27 +8,40 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Ensure correct protocol detection when behind a proxy (Render/Heroku)
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session configuration
+// Session configuration: register once
 app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
     resave: false,
     saveUninitialized: false,
+    name: 'kt.sid',
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // HTTPS in production
+        secure: false, // will be toggled per request below
         httpOnly: true,
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
 
+// Toggle secure cookie per request based on actual protocol
+app.use((req, _res, next) => {
+    const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    if (req.session && req.session.cookie) {
+        req.session.cookie.secure = !!isSecure;
+    }
+    next();
+});
+
 // Serve static files only for authenticated users
 app.use((req, res, next) => {
-    // Allow access to login page and auth endpoints
-    if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/check-auth') {
+    // Allow access to login page, auth endpoints, and favicon
+    if (req.path === '/login.html' || req.path === '/api/login' || req.path === '/api/check-auth' || req.path === '/favicon.ico') {
         return next();
     }
     
@@ -43,6 +56,13 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(path.join(__dirname)));
+
+// Lightweight favicon handler to avoid redirect loops when unauthenticated
+app.get('/favicon.ico', (req, res) => {
+    // If you add a real favicon file later, serve it here
+    // For now return an empty icon response
+    res.status(204).end();
+});
 
 // Data file path
 const DATA_FILE = path.join(__dirname, 'data', 'appliances.json');
@@ -89,9 +109,22 @@ app.post('/api/login', async (req, res) => {
         if (username === user.username) {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
-                req.session.authenticated = true;
-                req.session.username = username;
-                return res.json({ success: true });
+                // Regenerate session to prevent fixation, then save auth state
+                return req.session.regenerate(err => {
+                    if (err) {
+                        console.error('Session regenerate error:', err);
+                        return res.status(500).json({ error: 'Server error' });
+                    }
+                    req.session.authenticated = true;
+                    req.session.username = username;
+                    req.session.save(err2 => {
+                        if (err2) {
+                            console.error('Session save error:', err2);
+                            return res.status(500).json({ error: 'Server error' });
+                        }
+                        return res.json({ success: true });
+                    });
+                });
             }
         }
         
