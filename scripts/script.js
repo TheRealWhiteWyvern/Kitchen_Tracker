@@ -96,7 +96,9 @@ class Drawer{
         // Click to Open (debounced during animation)
         draw.onclick = () => {
             if (this.animating) return;
+            this.toggleItems(draw);
             this.animating = true;
+            
 
             // Optional visual state before redraw
             draw.classList.add("open");
@@ -112,10 +114,6 @@ class Drawer{
 
     drawOpen(draw){
         this.isOpen = true;
-        const item1 = new Item("Chips", "Frozen1");
-        const item2 = new Item("Veggies", "Frozen2");
-        this.items.push(item1, item2);
-        this.listItems();
         // Reset any previous handler to avoid stacking
         draw.onclick = null;
 
@@ -128,6 +126,7 @@ class Drawer{
         // Click to Close (debounced during animation)
         draw.onclick = () => {
             if (this.animating) return;
+            this.toggleItems(draw);
             this.animating = true;
 
             draw.classList.remove("open");
@@ -141,11 +140,123 @@ class Drawer{
 
     }
 
-    listItems(){
-        console.log(`Items in Drawer ${this.num}:`);
-        for (let i = 0; i < this.items.length; i++){
-            console.log(`- ${this.items[i].name} (${this.items[i].type})`);
+    toggleItems(draw, loop=false){
+        const itemPopup = document.getElementById('item-popup');
+        
+        if (!loop){
+            itemPopup.classList.toggle("show");
+        }
+        
+        // Clear and rebuild popup content
+        itemPopup.innerHTML = "";
+        
+        // Add title and item list
+        const title = document.createElement("h3");
+        title.textContent = `Drawer ${this.num}`;
+        itemPopup.appendChild(title);
+        
+        const itemList = document.createElement("div");
+        itemList.className = "item-list";
+        if (this.items.length > 0) {
+            this.items.forEach(item => {
+                const itemCard = document.createElement("div");
+                itemCard.className = "item-card";
+                itemCard.innerHTML = `<h4>${item.name}</h4><p>${item.type}</p>`;
+                itemList.appendChild(itemCard);
+            });
+        } else {
+            itemList.textContent = "No items in this drawer.";
+        }
+        itemPopup.appendChild(itemList);
+        
+        // Add Item button
+        const addItem = document.createElement("button");
+        addItem.textContent = "Add Item";
+        addItem.className = "popup-button";
+        itemPopup.appendChild(addItem);
+        addItem.onclick = () => {
+            this.showAddItemForm(draw, itemPopup);
         };
+
+        // Close button
+        const closeDrawer = document.createElement("button");
+        closeDrawer.textContent = "Close";
+        closeDrawer.className = "popup-button";
+        itemPopup.appendChild(closeDrawer);
+        closeDrawer.onclick = () => {
+            this.drawClosed(draw);
+            itemPopup.classList.remove("show");
+        };
+    }
+
+    showAddItemForm(draw, itemPopup) {
+        // Clear popup and show form
+        itemPopup.innerHTML = "";
+        
+        const formContainer = document.createElement("div");
+        formContainer.className = "add-item-form";
+        
+        const title = document.createElement("h3");
+        title.textContent = `Add Item to Drawer ${this.num}`;
+        formContainer.appendChild(title);
+        
+        const form = document.createElement("form");
+        
+        // Item Name
+        const nameLabel = document.createElement("label");
+        nameLabel.textContent = "Item Name:";
+        form.appendChild(nameLabel);
+        
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.name = "itemName";
+        nameInput.required = true;
+        nameInput.placeholder = "e.g., Ice Cream";
+        form.appendChild(nameInput);
+        
+        // Item Type
+        const typeLabel = document.createElement("label");
+        typeLabel.textContent = "Item Type:";
+        form.appendChild(typeLabel);
+        
+        const typeInput = document.createElement("input");
+        typeInput.type = "text";
+        typeInput.name = "itemType";
+        typeInput.required = true;
+        typeInput.placeholder = "e.g., Frozen Food";
+        form.appendChild(typeInput);
+        
+        // Submit button
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.textContent = "Add Item";
+        submitButton.className = "popup-button";
+        form.appendChild(submitButton);
+        
+        // Cancel button
+        const cancelButton = document.createElement("button");
+        cancelButton.type = "button";
+        cancelButton.textContent = "Cancel";
+        cancelButton.className = "popup-button cancel";
+        form.appendChild(cancelButton);
+        
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const newItemName = nameInput.value.trim();
+            const newItemType = typeInput.value.trim();
+            if (newItemName && newItemType) {
+                const newItem = new Item(newItemName, newItemType);
+                this.items.push(newItem);
+                this.toggleItems(draw, true); // Refresh popup
+            }
+        };
+        
+        cancelButton.onclick = () => {
+            this.toggleItems(draw, true); // Go back to item list
+        };
+        
+        formContainer.appendChild(form);
+        itemPopup.appendChild(formContainer);
     }
 
 }

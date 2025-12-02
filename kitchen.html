@@ -10,6 +10,9 @@
     <div id="kitchen-appliances">
         <h2>Appliances</h2>
         <button id="toggle-add-form" onclick="toggleAddApplianceForm()">Show Add Appliance Form</button>
+        <div class="popup">
+            <span class="popuptext" id="item-popup">Some text</span>
+        </div>
         <div id="appliance-form-container">
             <form id="add-appliance-form" onsubmit="AddAppliance(document.getElementById('appliance-name').value, document.getElementById('appliance-location').value, document.getElementById('num-drawers').value); showAppliances(); return false;">
                 <label for="appliance-name">Appliance Name:</label>
